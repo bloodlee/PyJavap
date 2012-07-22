@@ -1,1 +1,10 @@
-This file was created by PyCharm 2.5.2 for binding GitHub repository
+PyJavap is a python-version "javap".
+
+Main Functions
+====================
+1. Parse the java class
+
+
+Usage
+====================
+.....
