@@ -45,4 +45,7 @@ def HexToByte(hexStr):
 
     return ''.join( bytes )
 
+def ByteToDec(byteStr):
+    return int(ByteToHex(byteStr), 16)
+
 
