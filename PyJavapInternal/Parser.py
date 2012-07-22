@@ -3,7 +3,6 @@ __author__ = 'jasonlee'
 import os.path
 import os
 from PyJavapInternal.ParsingResult import ParsingResult
-import types
 
 class Parser:
 
