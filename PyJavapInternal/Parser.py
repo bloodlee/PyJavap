@@ -55,12 +55,60 @@ class Parser:
         Pay attention here. Constant index starts from 1, not 0.
         """
 
+        assert self.clsFile is not None
+
         const_count = ByteToDec(self.clsFile.read(2)) - 1
         self.result.setConstPoolCount(const_count)
 
         constants = ConstantPool.parse(const_count, self.clsFile)
         self.result.setConstants(constants)
 
+
+    def __parseAccessFlag(self):
+        """
+        Parse the access flag
+        """
+
+        assert self.clsFile is not None
+
+        accessFlag = ByteToDec(self.clsFile.read(2))
+        self.result.setAccessFlag(accessFlag)
+
+    def __parseThis(self):
+        """
+        Parse "this" section
+        """
+
+        assert self.clsFile is not None
+
+        thisIndex = ByteToDec(self.clsFile.read(2))
+        self.result.setThisIndex(thisIndex)
+
+    def __parseSuper(self):
+        """
+        Parse "super" section
+        """
+
+        assert self.clsFile is not None
+
+        superIndex = ByteToDec(self.clsFile.read(2))
+        self.result.setSuperIndex(superIndex)
+
+    def __parseInterface(self):
+        """
+        Parse "interface" section
+        """
+
+        assert self.clsFile is not None
+
+        interfaceCount = ByteToDec(self.clsFile.read(2))
+
+        interfaceIndex = []
+        if interfaceCount > 0:
+            for i in range(interfaceCount):
+                interfaceIndex.append(ByteToDec(self.clsFile.read(2)))
+
+        self.result.setInterfaces(interfaceCount, interfaceIndex)
 
     def parse(self):
 
@@ -74,6 +122,10 @@ class Parser:
             self.__parseMagicNum()
             self.__parseVersion()
             self.__parseConstantPool()
+            self.__parseAccessFlag()
+            self.__parseThis()
+            self.__parseSuper()
+            self.__parseInterface()
 
         except ParsingException,e:
 

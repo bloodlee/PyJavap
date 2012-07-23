@@ -78,6 +78,9 @@ class ConstantUTF8Info(ConstantInfo):
     def __str__(self):
         return "%s: %s (%d chars)" % (self.getTypeName(), self.utf8, self.length)
 
+    def getUtf8(self):
+        return self.utf8
+
     @staticmethod
     def parse(fh):
         """
