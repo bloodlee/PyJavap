@@ -6,6 +6,8 @@ from PyJavapInternal.ParsingResult import ParsingResult
 from PyJavapInternal.ParsingException import ParsingException
 from PyJavapInternal import ByteToDec
 from PyJavapInternal.ConstantPool import ConstantPool
+from PyJavapInternal.Field import Field
+from PyJavapInternal.Attribute import Attribute
 
 class Parser:
 
@@ -110,6 +112,63 @@ class Parser:
 
         self.result.setInterfaces(interfaceCount, interfaceIndex)
 
+    def __parseFields(self):
+        """
+        Parse fields sections.
+        """
+
+        assert self.clsFile is not None
+
+        fieldCount = ByteToDec(self.clsFile.read(2))
+
+        fields = []
+        for index in range(fieldCount):
+            accessFlag = ByteToDec(self.clsFile.read(2))
+            name = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
+            descriptor = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
+
+            field = Field(name, descriptor, accessFlag)
+
+            attrCount = ByteToDec(self.clsFile.read(2))
+            if attrCount > 0:
+                for i in range(attrCount):
+                    attributeIndex = self.clsFile.read(2)
+                    attributeLength = ByteToDec(self.clsFile.read(4))
+                    self.clsFile.read(attributeLength)
+
+            fields.append(field)
+
+        self.result.setFields(fieldCount, fields)
+
+    def __parseMethods(self):
+        """
+        Parse methods section.
+        """
+
+        assert  self.clsFile is not None
+
+        methodCount = ByteToDec(self.clsFile.read(2))
+
+        methods = []
+        for index in range(methodCount):
+            accessFlag = ByteToDec(self.clsFile.read(2))
+            name = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
+            descriptor = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
+
+            field = Field(name, descriptor, accessFlag)
+
+            attrCount = ByteToDec(self.clsFile.read(2))
+            if attrCount > 0:
+                for i in range(attrCount):
+                    attributeIndex = self.clsFile.read(2)
+                    attributeLength = ByteToDec(self.clsFile.read(4))
+                    self.clsFile.read(attributeLength)
+
+            methods.append(field)
+
+        self.result.setMethods(methodCount, methods)
+
+
     def parse(self):
 
         try:
@@ -126,6 +185,8 @@ class Parser:
             self.__parseThis()
             self.__parseSuper()
             self.__parseInterface()
+            self.__parseFields()
+            self.__parseMethods()
 
         except ParsingException,e:
 

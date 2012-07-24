@@ -2,8 +2,9 @@ __author__ = 'jasonlee'
 
 import PyJavapInternal
 from PyJavapInternal import ClassAccessFlags, FieldAccessFlags
-from PyJavapInternal.ConstantPool import ConstantClassInfo
+from PyJavapInternal.ConstantPool import ConstantClassInfo, ConstantUTF8Info
 from PyJavapInternal.ParsingException import ParsingException
+from PyJavapInternal.ConstantPool import *
 
 class ParsingResult:
 
@@ -23,6 +24,12 @@ class ParsingResult:
 
         self.interfaceCount = -1
         self.interfaces = None
+
+        self.fieldCount = -1
+        self.fields = None
+
+        self.methodCount = -1
+        self.methods = None
 
     def setMagicNumber(self, magicNumber):
         self.magicNumber = magicNumber
@@ -49,6 +56,14 @@ class ParsingResult:
     def setInterfaces(self, count, interfaces):
         self.interfaceCount = count
         self.interfaces = interfaces
+
+    def setFields(self, count, fields):
+        self.fieldCount = count
+        self.fields = fields
+
+    def setMethods(self, count, methods):
+        self.methodCount = count
+        self.methods = methods
 
     def __str__(self):
 
@@ -90,6 +105,19 @@ class ParsingResult:
         else:
             result += "No interface\n"
 
+
+        if self.fieldCount > 0:
+
+            result += "Fields(%d): \n" % self.fieldCount
+            for i in range(self.fieldCount):
+                result += "\t" + str(self.fields[i]) + "\n"
+
+        if self.methodCount > 0:
+
+            result += "Methods(%d): \n" % self.methodCount
+            for i in range(self.methodCount):
+                result += "\t" + str(self.methods[i]) + "\n"
+
         return result
 
     def __getClassName(self, index):
@@ -109,3 +137,15 @@ class ParsingResult:
             return className
         else:
             raise ParsingException('Const index is out of range.')
+
+    def getUtf8(self, index):
+
+        if index in range(1, self.const_pool_count + 1):
+
+            typeName = self.constants[index - 1].getTypeName()
+            if typeName == TYPE_UTF8:
+                return self.constants[index - 1].getUtf8()
+            else:
+                raise ParsingException('The index is not for UTF8 info.')
+        else:
+            raise ParsingException('Index is out of range.')

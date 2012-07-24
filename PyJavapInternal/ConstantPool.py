@@ -15,6 +15,8 @@ CONSTANT_METHODREF_INFO = 0x0A
 CONSTANT_INTERFACEMETHODREF_INFO = 0x0B
 CONSTANT_NAMEANDTYPE_INFO = 0x0C
 
+TYPE_UTF8 = "UTF8"
+
 class ConstantInfo(object):
     """
     Base class of constant info.
@@ -73,7 +75,7 @@ class ConstantUTF8Info(ConstantInfo):
         self.utf8 = utf8
 
     def getTypeName(self):
-        return "UTF8"
+        return TYPE_UTF8
 
     def __str__(self):
         return "%s: %s (%d chars)" % (self.getTypeName(), self.utf8, self.length)
