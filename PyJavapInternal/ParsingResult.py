@@ -89,16 +89,16 @@ class ParsingResult:
         result += "Access Flag: %s\n" % ClassAccessFlags.flagToStr(self.accessFlag)
 
         if self.thisIndex >= 1:
-            result += "this: %s\n" % self.__getClassName(self.thisIndex)
+            result += "this: %s\n" % self.getClassName(self.thisIndex)
 
         if self.superIndex >= 1:
-            result += "super: %s\n" % self.__getClassName(self.superIndex)
+            result += "super: %s\n" % self.getClassName(self.superIndex)
 
         if self.interfaceCount > 0:
 
             result += "Implemented interfaces: "
             for i in range(self.interfaceCount):
-                result += self.__getClassName(self.interfaces[i]) + ","
+                result += self.getClassName(self.interfaces[i]) + ","
             result = result[:-1] # eliminate the last ','
             result += "\n"
 
@@ -120,7 +120,7 @@ class ParsingResult:
 
         return result
 
-    def __getClassName(self, index):
+    def getClassName(self, index):
         """
         Get the class from constant pool.
         """

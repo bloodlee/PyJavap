@@ -7,7 +7,10 @@ from PyJavapInternal.ParsingException import ParsingException
 from PyJavapInternal import ByteToDec
 from PyJavapInternal.ConstantPool import ConstantPool
 from PyJavapInternal.Field import Field
+from PyJavapInternal.Method import Method
 from PyJavapInternal.Attribute import Attribute
+from PyJavapInternal.Attribute import *
+from PyJavapInternal.ExceptionInfo import ExceptionInfo
 
 class Parser:
 
@@ -155,16 +158,54 @@ class Parser:
             name = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
             descriptor = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
 
-            field = Field(name, descriptor, accessFlag)
+            method = Method(name, descriptor, accessFlag)
 
             attrCount = ByteToDec(self.clsFile.read(2))
             if attrCount > 0:
                 for i in range(attrCount):
-                    attributeIndex = self.clsFile.read(2)
+                    attribute = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
                     attributeLength = ByteToDec(self.clsFile.read(4))
-                    self.clsFile.read(attributeLength)
 
-            methods.append(field)
+                    if attribute == CodeAttribute.getAttrName():
+
+                        codeAttr = CodeAttribute(attributeLength)
+
+                        maxStack = ByteToDec(self.clsFile.read(2))
+                        maxLocal = ByteToDec(self.clsFile.read(2))
+
+                        codeLength = ByteToDec(self.clsFile.read(4))
+                        code = ByteToHex(self.clsFile.read(codeLength))
+
+                        codeAttr.setMaxStack(maxStack)
+                        codeAttr.setMaxLocal(maxLocal)
+                        codeAttr.setCode(code)
+
+                        exceptionLen = ByteToDec(self.clsFile.read(2))
+                        if exceptionLen > 0:
+                            for i in range(exceptionLen):
+                                startPC = ByteToHex(self.clsFile.read(2))
+                                endPC = ByteToHex(self.clsFile.read(2))
+                                handlerPC = ByteToHex(self.clsFile.read(2))
+                                exceptionClass = self.result.getClassName(ByteToDec(self.clsFile.read(2)))
+
+                                exceptionInfo = ExceptionInfo(startPC, endPC, handlerPC, exceptionClass)
+
+                                codeAttr.addException(exceptionInfo)
+
+                        subAttrCount = ByteToDec(self.clsFile.read(2))
+                        if subAttrCount > 0:
+                            for i in range(subAttrCount):
+                                subAttr = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
+                                subAttrLength = ByteToDec(self.clsFile.read(4))
+
+                                self.clsFile.read(subAttrLength)
+
+
+                        method.addAttribute(codeAttr)
+                    else:
+                        self.clsFile.read(attributeLength)
+
+            methods.append(method)
 
         self.result.setMethods(methodCount, methods)
 
