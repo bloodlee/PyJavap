@@ -1,5 +1,7 @@
 __author__ = 'jasonlee'
 
+from PyJavapInternal import doFlagToStr
+
 ACC_PUBLIC = 0x0001
 ACC_PRIVATE = 0x0002
 ACC_PROTECTED = 0x0004
@@ -32,11 +34,4 @@ def flagToStr(flag):
     """
     Return the string of flag
     """
-
-    result = ''
-
-    for key in __flagToName.keys():
-        if flag & key:
-            result += __flagToName[key] + " "
-
-    return result.strip()
+    return doFlagToStr(flag, __flagToName)
