@@ -163,50 +163,15 @@ class Parser:
             attrCount = ByteToDec(self.clsFile.read(2))
             if attrCount > 0:
                 for i in range(attrCount):
-                    attribute = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
+                    attributeName = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
                     attributeLength = ByteToDec(self.clsFile.read(4))
 
-                    if attribute == CodeAttribute.getAttrName():
+                    # for now, only parse the "Code Attribute
+                    parser = Attribute.getParser(attributeName)
 
-                        codeAttr = CodeAttribute(attributeLength)
-
-                        maxStack = ByteToDec(self.clsFile.read(2))
-                        maxLocal = ByteToDec(self.clsFile.read(2))
-
-                        codeLength = ByteToDec(self.clsFile.read(4))
-                        code = ByteToHex(self.clsFile.read(codeLength))
-
-                        codeAttr.setMaxStack(maxStack)
-                        codeAttr.setMaxLocal(maxLocal)
-                        codeAttr.setCode(code)
-
-                        exceptionLen = ByteToDec(self.clsFile.read(2))
-                        if exceptionLen > 0:
-                            for i in range(exceptionLen):
-                                startPC = ByteToDec(self.clsFile.read(2))
-                                endPC = ByteToDec(self.clsFile.read(2))
-                                handlerPC = ByteToDec(self.clsFile.read(2))
-
-                                classIndex = ByteToDec(self.clsFile.read(2))
-                                if classIndex != 0:
-                                    exceptionClass = self.result.getClassName(classIndex)
-                                else:
-                                    exceptionClass = "any"
-
-                                exceptionInfo = ExceptionInfo(startPC, endPC, handlerPC, exceptionClass)
-
-                                codeAttr.addException(exceptionInfo)
-
-                        subAttrCount = ByteToDec(self.clsFile.read(2))
-                        if subAttrCount > 0:
-                            for i in range(subAttrCount):
-                                subAttr = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
-                                subAttrLength = ByteToDec(self.clsFile.read(4))
-
-                                self.clsFile.read(subAttrLength)
-
-
-                        method.addAttribute(codeAttr)
+                    if parser is not None:
+                        attribute = parser(self.clsFile, self.result)
+                        method.addAttribute(attribute)
                     else:
                         self.clsFile.read(attributeLength)
 

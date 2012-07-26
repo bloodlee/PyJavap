@@ -48,4 +48,16 @@ def HexToByte(hexStr):
 def ByteToDec(byteStr):
     return int(ByteToHex(byteStr), 16)
 
+def doFlagToStr(flag, aDict):
+    """
+    Return the string of flag
+    """
+
+    result = ''
+
+    for key in aDict.keys():
+        if flag & key:
+            result += aDict[key] + " "
+
+    return result.strip()
 

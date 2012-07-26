@@ -2,9 +2,12 @@ PyJavap is a python-version "javap".
 
 Main Functions
 ====================
-1. Parse the java class
+1. Parse the java class file
+2. Provide a friendly client GUI
 
-
-Usage
+Script Usage
 ====================
-.....
+python pyjavap.py -cf CLASS_FILE
+
+Use "python pyjavap.py -h" to get more information.
+
