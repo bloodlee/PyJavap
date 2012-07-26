@@ -1,10 +1,13 @@
 __author__ = 'yli'
 
 import sys
-from PyQt4.QtGui import QApplication, QPushButton
+from PyQt4.QtGui import QApplication
+from PyJavapGuiInternal.PyAnalyzerMainDialog import PyAnalyzerMainDialog
 
-app = QApplication(sys.argv)
-button = QPushButton("Hello,World")
-button.show()
+if __name__ == '__main__':
 
-sys.exit(app.exec_())
+    app = QApplication(sys.argv)
+    mainDlg = PyAnalyzerMainDialog()
+    mainDlg.show()
+
+    sys.exit(app.exec_())

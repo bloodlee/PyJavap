@@ -34,9 +34,15 @@ class ParsingResult:
     def setMagicNumber(self, magicNumber):
         self.magicNumber = magicNumber
 
+    def getMagicNumber(self):
+        return self.magicNumber
+
     def setVersion(self, major, minor):
         self.majorVer = major
         self.minorVer = minor
+
+    def getVersions(self):
+        return (self.majorVer, self.minorVer)
 
     def setConstPoolCount(self, count):
         self.const_pool_count = count
@@ -44,8 +50,14 @@ class ParsingResult:
     def setConstants(self, constants):
         self.constants = constants
 
+    def getConstants(self):
+        return self.constants
+
     def setAccessFlag(self, accessFlag):
         self.accessFlag = accessFlag
+
+    def getAccessFlag(self):
+        return self.accessFlag
 
     def setThisIndex(self, thisIndex):
         self.thisIndex = thisIndex

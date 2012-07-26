@@ -48,8 +48,8 @@ class Parser:
 
         assert self.clsFile is not None
 
-        minorVerBytes = self.clsFile.read(2)
         majorVerBytes = self.clsFile.read(2)
+        minorVerBytes = self.clsFile.read(2)
 
         self.result.setVersion(ByteToDec(minorVerBytes), ByteToDec(majorVerBytes))
 
