@@ -183,10 +183,15 @@ class Parser:
                         exceptionLen = ByteToDec(self.clsFile.read(2))
                         if exceptionLen > 0:
                             for i in range(exceptionLen):
-                                startPC = ByteToHex(self.clsFile.read(2))
-                                endPC = ByteToHex(self.clsFile.read(2))
-                                handlerPC = ByteToHex(self.clsFile.read(2))
-                                exceptionClass = self.result.getClassName(ByteToDec(self.clsFile.read(2)))
+                                startPC = ByteToDec(self.clsFile.read(2))
+                                endPC = ByteToDec(self.clsFile.read(2))
+                                handlerPC = ByteToDec(self.clsFile.read(2))
+
+                                classIndex = ByteToDec(self.clsFile.read(2))
+                                if classIndex != 0:
+                                    exceptionClass = self.result.getClassName(classIndex)
+                                else:
+                                    exceptionClass = "any"
 
                                 exceptionInfo = ExceptionInfo(startPC, endPC, handlerPC, exceptionClass)
 
