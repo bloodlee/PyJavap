@@ -179,6 +179,25 @@ class Parser:
 
         self.result.setMethods(methodCount, methods)
 
+    def __parseAttribute(self):
+        """
+        Parse the attributes of class file.
+        """
+
+        attrCount = ByteToDec(self.clsFile.read(2))
+        if attrCount > 0:
+            for i in range(attrCount):
+                attributeName = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
+                attributeLength = ByteToDec(self.clsFile.read(4))
+
+                parser = Attribute.getParser(attributeName)
+
+                if parser is not None:
+                    attribute = parser(self.clsFile, self.result)
+                    self.result.addAttribute(attribute)
+                else:
+                    self.clsFile.read(attributeLength)
+
 
     def parse(self):
 
@@ -198,6 +217,7 @@ class Parser:
             self.__parseInterface()
             self.__parseFields()
             self.__parseMethods()
+            self.__parseAttribute()
 
         except ParsingException,e:
 

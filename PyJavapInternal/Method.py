@@ -19,6 +19,8 @@ class Method(object):
         result = "Name: " + self.name + "(" + self.descriptor + ")"
         result += " Access: " + MethodAccessFlags.flagToStr(self.access)
 
+        result += "\n"
+
         if len(self.attributes):
             result += "\tAttributes\n"
             for attr in self.attributes:

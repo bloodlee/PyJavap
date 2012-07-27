@@ -31,6 +31,8 @@ class ParsingResult:
         self.methodCount = -1
         self.methods = None
 
+        self.attributes = []
+
     def setMagicNumber(self, magicNumber):
         self.magicNumber = magicNumber
 
@@ -77,6 +79,9 @@ class ParsingResult:
         self.methodCount = count
         self.methods = methods
 
+    def addAttribute(self, attribute):
+        self.attributes.append(attribute)
+
     def __str__(self):
 
         result = ""
@@ -86,15 +91,14 @@ class ParsingResult:
         result += "Major Version: %d\n" % self.majorVer
         result += "Minor Version: %d\n" % self.minorVer
 
-        result += "Constant Pool (Count %d)\n" % self.const_pool_count
+        result += "Constant Pool (Count %d)\n" % len(self.constants)
 
-        if self.const_pool_count > 0:
+        if len(self.constants) > 0:
             if self.constants is not None:
-                if len(self.constants) == self.const_pool_count:
-                    result += "==========================\n"
+                result += "==========================\n"
 
-                    for i in range(self.const_pool_count):
-                        result += 'const #%d = %s\n' % (i + 1, str(self.constants[i]))
+                for i in range(len(self.constants)):
+                    result += 'const #%d = %s\n' % (i + 1, str(self.constants[i]))
 
             result += "==========================\n"
 
@@ -105,6 +109,15 @@ class ParsingResult:
 
         if self.superIndex >= 1:
             result += "super: %s\n" % self.getClassName(self.superIndex)
+
+        if len(self.attributes):
+            result += "Attributes\n"
+            result += "=====================\n"
+
+            for attribute in self.attributes:
+                result += str(attribute) + "\n"
+
+            result += "\n"
 
         if self.interfaceCount > 0:
 

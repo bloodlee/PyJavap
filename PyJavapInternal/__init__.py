@@ -48,6 +48,9 @@ def HexToByte(hexStr):
 def ByteToDec(byteStr):
     return int(ByteToHex(byteStr), 16)
 
+def ByteTo32BitFloat(c):
+    return ord(c[0]) + (ord(c[1])<<8) + (ord(c[2])<<16) + (ord(c[3])<<24)
+
 def doFlagToStr(flag, aDict):
     """
     Return the string of flag

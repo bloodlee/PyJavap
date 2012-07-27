@@ -10,12 +10,22 @@ class AException extends Exception {
 
 }
 
+@Deprecated
 public class Hello implements IHello, IHello2 {
 
     private static final int a = 0;
 
     public static final int b = 1;
 
+    public static final long c = 2;
+
+    public static final String d = "123";
+
+    public static final double e = 1.2;
+
+    public static final float f = 1.4f;
+
+    @Deprecated
     public int add(int a, int b) {
 
         try {

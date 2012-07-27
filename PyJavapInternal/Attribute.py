@@ -27,12 +27,74 @@ class Attribute(object):
             CODE_NAME: CodeAttribute.parse,
             LINE_NUMBER_TABLE_NAME: LineNumberTableAttribute.parse,
             LOCAL_VARIABLE_TABLE_NAME: LocalVariableTableAttribute.parse,
+            SOURCE_FILE_NAME: SourceFileAttribute.parse,
+            SYNTHETIC_NAME: SyntheticAttribute.parse,
+            DEPRECATED_NAME: DeprecatedAttribute.parse,
         }
 
         if parserDict.has_key(attrName):
             return parserDict[attrName]
         else:
             return None
+
+class SyntheticAttribute(Attribute):
+
+    def __init__(self):
+        super(SyntheticAttribute, self).__init__(SYNTHETIC_NAME)
+
+    def __str__(self):
+        return "Synthetic"
+
+    @staticmethod
+    def parse(clsFile, result):
+
+        attribute = SyntheticAttribute()
+
+        return attribute
+
+class DeprecatedAttribute(Attribute):
+
+    def __init__(self):
+        super(DeprecatedAttribute, self).__init__(DEPRECATED_NAME)
+
+    def __str__(self):
+        return "Deprecated"
+
+    @staticmethod
+    def parse(clsFile, result):
+
+        attribute = DeprecatedAttribute()
+
+        return attribute
+
+class SourceFileAttribute(Attribute):
+
+    def __init__(self):
+
+        super(SourceFileAttribute, self).__init__(SOURCE_FILE_NAME)
+
+        self.sourceFileName = ''
+
+    def getSourceFile(self):
+        return self.sourceFileName
+
+    def setSourceFile(self, sourceFileName):
+        self.sourceFileName = sourceFileName
+
+    def __str__(self):
+
+        return 'Source File: %s' % self.sourceFileName
+
+    @staticmethod
+    def parse(clsFile, result):
+
+        attribute = SourceFileAttribute()
+
+        sourceFileIndex = ByteToDec(clsFile.read(2))
+
+        attribute.setSourceFile(result.getUtf8(sourceFileIndex))
+
+        return attribute
 
 class LocalVariableTableAttribute(Attribute):
 
