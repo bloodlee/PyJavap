@@ -25,6 +25,12 @@ public class Hello implements IHello, IHello2 {
 
     public static final float f = 1.4f;
 
+    public class NestedA {
+
+        private int a = 1;
+
+    }
+
     @Deprecated
     public int add(int a, int b) {
 

@@ -2,6 +2,7 @@ __author__ = 'jason'
 
 from PyJavapInternal import ByteToHex, ByteToDec
 from PyJavapInternal.ExceptionInfo import ExceptionInfo
+from PyJavapInternal import InnerClassAccessFlags
 
 CODE_NAME = 'Code'
 LINE_NUMBER_TABLE_NAME = 'LineNumberTable'
@@ -30,12 +31,44 @@ class Attribute(object):
             SOURCE_FILE_NAME: SourceFileAttribute.parse,
             SYNTHETIC_NAME: SyntheticAttribute.parse,
             DEPRECATED_NAME: DeprecatedAttribute.parse,
+            INNER_CLASSES_NAME: InnerClassesAttribute.parse,
+            CONSTANT_VALUE_NAME: ConstantValueAttribute.parse,
         }
 
         if parserDict.has_key(attrName):
             return parserDict[attrName]
         else:
             return None
+
+class ConstantValueAttribute(Attribute):
+
+    def __init__(self):
+        super(ConstantValueAttribute, self).__init__(CONSTANT_VALUE_NAME)
+
+        self.constantValueIndex = -1
+
+    def setValueIndex(self, index):
+
+        self.constantValueIndex = index
+
+    def getValueIndex(self):
+
+        return self.constantValueIndex
+
+    def __str__(self):
+
+        return "Constant Value: #%d" % self.constantValueIndex
+
+    @staticmethod
+    def parse(clsFile, result):
+
+        attribute = ConstantValueAttribute()
+
+        classIndex = ByteToDec(clsFile.read(2))
+
+        attribute.setValueIndex(classIndex)
+
+        return attribute
 
 class SyntheticAttribute(Attribute):
 
@@ -64,6 +97,74 @@ class DeprecatedAttribute(Attribute):
     def parse(clsFile, result):
 
         attribute = DeprecatedAttribute()
+
+        return attribute
+
+class InnerClassesAttribute(Attribute):
+
+    class InnerClassesInfo:
+
+        def __init__(self, innerClassIndex, outerClassIndex, innerNameIndex, innerClassAccessFlags):
+            self.innerClassIndex = innerClassIndex
+            self.outerClassIndex = outerClassIndex
+            self.innerNameIndex = innerNameIndex
+            self.innerClassAccessFlags = innerClassAccessFlags
+
+        def __str__(self):
+
+            result = ''
+
+            result += '#%d(Inner class #%d, Outer class #%d, Access %s)' % (self.innerNameIndex,
+                                                                                    self.innerClassIndex,
+                                                                                    self.outerClassIndex, InnerClassAccessFlags.flagToStr(self.innerClassAccessFlags))
+            return result
+
+    def __init__(self):
+
+        super(InnerClassesAttribute, self).__init__(INNER_CLASSES_NAME)
+
+        self.classes = []
+
+    def addInnerClass(self, innerClass):
+
+        self.classes.append(innerClass)
+
+    def __str__(self):
+
+        result = ""
+
+        result += "InnerClasses\n"
+        result += "==============================\n"
+
+        for innerClass in self.classes:
+
+            result += str(innerClass) + "\n"
+
+        result += "\n"
+
+        return result
+
+
+    @staticmethod
+    def parse(clsFile, result):
+
+        attribute = InnerClassesAttribute()
+
+        numberOfClasses = ByteToDec(clsFile.read(2))
+
+        if numberOfClasses > 0:
+
+            for i in range(numberOfClasses):
+
+                innerClassIndex = ByteToDec(clsFile.read(2))
+                outerClassIndex = ByteToDec(clsFile.read(2))
+                innerNameIndex = ByteToDec(clsFile.read(2))
+                innerClassAccessFlags = ByteToDec(clsFile.read(2))
+
+                innerClassInfo = InnerClassesAttribute.InnerClassesInfo(innerClassIndex, outerClassIndex, innerNameIndex, innerClassAccessFlags)
+
+                attribute.addInnerClass(innerClassInfo)
+
 
         return attribute
 

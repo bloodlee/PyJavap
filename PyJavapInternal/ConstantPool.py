@@ -1,7 +1,7 @@
 __author__ = 'jasonlee'
 
 from PyJavapInternal.ParsingException import ParsingException
-from PyJavapInternal import ByteToDec,ByteToHex
+from PyJavapInternal import ByteToDec,ByteToHex, ByteTo32BitFloat,ByteTo64BitFloat
 
 CONSTANT_UTF8_INFO = 0x01
 CONSTANT_INTEGER_INFO = 0x03
@@ -135,7 +135,7 @@ class ConstantLongInfo(ConstantInfo):
 
         self.long = long
 
-    def getInteger(self):
+    def getLong(self):
 
         return self.long
 
@@ -158,13 +158,13 @@ class ConstantFloatInfo(ConstantInfo):
 
         self.floatNum = floatNum
 
-    def getInteger(self):
+    def getFloat(self):
 
         return self.floatNum
 
     def __str__(self):
 
-        return "Float: %s" % ByteToHex(self.floatNum)
+        return "Float: %s" % ByteTo32BitFloat(self.floatNum)
 
     @staticmethod
     def parse(fh):
@@ -181,13 +181,13 @@ class ConstantDoubleInfo(ConstantInfo):
 
         self.doubleNum = doubleNum
 
-    def getInteger(self):
+    def getDouble(self):
 
         return self.doubleNum
 
     def __str__(self):
 
-        return "Double: %s" % ByteToHex(self.doubleNum)
+        return "Double: %s" % ByteTo64BitFloat(self.doubleNum)
 
     @staticmethod
     def parse(fh):
@@ -195,6 +195,156 @@ class ConstantDoubleInfo(ConstantInfo):
         assert fh is not None
 
         return ConstantDoubleInfo(fh.read(8))
+
+class ConstantStringInfo(ConstantInfo):
+
+    def __init__(self, stringIndex):
+
+        super(ConstantStringInfo, self).__init__(CONSTANT_STRING_INFO)
+
+        self.stringIndex = stringIndex
+
+    def getStringIndex(self):
+
+        return self.stringIndex
+
+    def __str__(self):
+
+        return "String: #%d" % self.stringIndex
+
+    @staticmethod
+    def parse(fh):
+
+        assert fh is not None
+
+        return ConstantStringInfo(ByteToDec(fh.read(2)))
+
+class ConstantFieldrefInfo(ConstantInfo):
+
+    def __init__(self, hostClassIndex, nameAndTypeIndex):
+
+        super(ConstantFieldrefInfo, self).__init__(CONSTANT_FIELDREF_INFO)
+
+        self.hostClassIndex = hostClassIndex
+        self.nameAndTypeIndex = nameAndTypeIndex
+
+    def getFieldClassIndex(self):
+
+        return self.hostClassIndex
+
+    def getNameAndTypeIndex(self):
+
+        return self.nameAndTypeIndex
+
+    def __str__(self):
+
+        return 'Fieldref: #%d (#%d)' % (self.hostClassIndex, self.nameAndTypeIndex)
+
+    @staticmethod
+    def parse(fh):
+
+        assert fh is not None
+
+        classInfoIndex = ByteToDec(fh.read(2))
+        nameAndTypeIndex = ByteToDec(fh.read(2))
+
+        return ConstantFieldrefInfo(classInfoIndex, nameAndTypeIndex)
+
+class ConstantMethodrefInfo(ConstantInfo):
+
+    def __init__(self, hostClassIndex, nameAndTypeIndex):
+
+        super(ConstantMethodrefInfo, self).__init__(CONSTANT_METHODREF_INFO)
+
+        self.hostClassIndex = hostClassIndex
+        self.nameAndTypeIndex = nameAndTypeIndex
+
+    def getFieldClassIndex(self):
+
+        return self.hostClassIndex
+
+    def getNameAndTypeIndex(self):
+
+        return self.nameAndTypeIndex
+
+    def __str__(self):
+
+        return 'Methodref: #%d (#%d)' % (self.hostClassIndex, self.nameAndTypeIndex)
+
+    @staticmethod
+    def parse(fh):
+
+        assert fh is not None
+
+        classInfoIndex = ByteToDec(fh.read(2))
+        nameAndTypeIndex = ByteToDec(fh.read(2))
+
+        return ConstantMethodrefInfo(classInfoIndex, nameAndTypeIndex)
+
+class ConstantInterfacerefInfo(ConstantInfo):
+
+    def __init__(self, hostClassIndex, nameAndTypeIndex):
+
+        super(ConstantInterfacerefInfo, self).__init__(CONSTANT_INTERFACEMETHODREF_INFO)
+
+        self.hostClassIndex = hostClassIndex
+        self.nameAndTypeIndex = nameAndTypeIndex
+
+    def getFieldClassIndex(self):
+
+        return self.hostClassIndex
+
+    def getNameAndTypeIndex(self):
+
+        return self.nameAndTypeIndex
+
+    def __str__(self):
+
+        return 'Interfaceref: #%d (#%d)' % (self.hostClassIndex, self.nameAndTypeIndex)
+
+    @staticmethod
+    def parse(fh):
+
+        assert fh is not None
+
+        classInfoIndex = ByteToDec(fh.read(2))
+        nameAndTypeIndex = ByteToDec(fh.read(2))
+
+        return ConstantInterfacerefInfo(classInfoIndex, nameAndTypeIndex)
+
+
+class ConstantNameAndTypeInfo(ConstantInfo):
+
+    def __init__(self, nameIndex, descriptorIndex):
+
+        super(ConstantNameAndTypeInfo, self).__init__(CONSTANT_NAMEANDTYPE_INFO)
+
+        self.nameIndex = nameIndex
+        self.descriptorIndex = descriptorIndex
+
+    def getNameIndex(self):
+
+        return self.nameIndex
+
+    def getDescriptorIndex(self):
+
+        return self.descriptorIndex
+
+    def __str__(self):
+
+        return 'NameAndType: #%d.#%d' % (self.nameIndex, self.descriptorIndex)
+
+    @staticmethod
+    def parse(fh):
+
+        assert fh is not None
+
+        nameIndex = ByteToDec(fh.read(2))
+        descriptorIndex = ByteToDec(fh.read(2))
+
+        return ConstantNameAndTypeInfo(nameIndex, descriptorIndex)
+
+
 
 class ConstantPool:
     """
@@ -210,6 +360,11 @@ class ConstantPool:
             CONSTANT_LONG_INFO: ConstantLongInfo.parse,
             CONSTANT_FLOAT_INFO: ConstantFloatInfo.parse,
             CONSTANT_DOUBLE_INFO: ConstantDoubleInfo.parse,
+            CONSTANT_STRING_INFO: ConstantStringInfo.parse,
+            CONSTANT_FIELDREF_INFO: ConstantFieldrefInfo.parse,
+            CONSTANT_METHODREF_INFO: ConstantMethodrefInfo.parse,
+            CONSTANT_INTERFACEMETHODREF_INFO: ConstantInterfacerefInfo.parse,
+            CONSTANT_NAMEANDTYPE_INFO: ConstantNameAndTypeInfo.parse,
         }
 
         if handlers.has_key(type):

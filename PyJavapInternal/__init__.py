@@ -9,6 +9,8 @@ HexToByte converts string "FF FE 00 01" to the byte string "\xFF\xFE\x00\x01"
 
 __author__ = 'jasonlee'
 
+import struct
+
 def ByteToHex(byteStr):
     """
     Convert a byte string to it's hex string representation e.g. for output.
@@ -48,8 +50,11 @@ def HexToByte(hexStr):
 def ByteToDec(byteStr):
     return int(ByteToHex(byteStr), 16)
 
-def ByteTo32BitFloat(c):
-    return ord(c[0]) + (ord(c[1])<<8) + (ord(c[2])<<16) + (ord(c[3])<<24)
+def ByteTo32BitFloat(_4bytes):
+    return struct.unpack('>f', _4bytes)
+
+def ByteTo64BitFloat(_8bytes):
+    return struct.unpack('>d', _8bytes)
 
 def doFlagToStr(flag, aDict):
     """

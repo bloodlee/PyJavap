@@ -19,6 +19,13 @@ class Field(object):
         result = "Name: " + self.name + "(" + self.descriptor + ")"
         result += " Access: " + FieldAccessFlags.flagToStr(self.access)
 
+        result += "\n"
+
+        if len(self.attributes):
+            result += "\tAttributes\n"
+            for attr in self.attributes:
+                result += "\t" + str(attr) + "\n"
+
         return result
 
 

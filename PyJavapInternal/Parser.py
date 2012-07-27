@@ -135,9 +135,17 @@ class Parser:
             attrCount = ByteToDec(self.clsFile.read(2))
             if attrCount > 0:
                 for i in range(attrCount):
-                    attributeIndex = self.clsFile.read(2)
+                    attributeName = self.result.getUtf8(ByteToDec(self.clsFile.read(2)))
                     attributeLength = ByteToDec(self.clsFile.read(4))
-                    self.clsFile.read(attributeLength)
+
+                    # for now, only parse the "Code Attribute
+                    parser = Attribute.getParser(attributeName)
+
+                    if parser is not None:
+                         attribute = parser(self.clsFile, self.result)
+                         field.addAttribute(attribute)
+                    else:
+                         self.clsFile.read(attributeLength)
 
             fields.append(field)
 
