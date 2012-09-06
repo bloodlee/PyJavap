@@ -295,6 +295,8 @@ class LineNumberTableAttribute(Attribute):
         return attribute
 
 
+import PyJavapInternal.ByteCode as bc
+
 class CodeAttribute(Attribute):
 
     def __init__(self):
@@ -334,7 +336,19 @@ class CodeAttribute(Attribute):
 
         result += "\tCodeAttr\n"
         result += "\t\tMax Stack: %d Max Local: %d\n" % (self.maxStack, self.maxLocal)
+        result += "\t\t-----------------------------------------------------------------\n"
         result += "\t\tCode: " + self.code + "\n"
+
+        byteIndex = 0
+        while byteIndex < len(self.code):
+            byteCode = bc.codeMap[int(self.code[byteIndex:byteIndex+2], 16)]
+
+            if byteCode:
+                result += "\t\t%d: %s\n" % (byteIndex / 2, byteCode.getMnemonic())
+
+                byteIndex += byteCode.getOpCodeCount() * 2
+
+            byteIndex += 2
 
         if len(self.exceptions) > 0:
 
@@ -346,7 +360,7 @@ class CodeAttribute(Attribute):
                 result += "\t\t" + str(self.exceptions[i]) + "\n"
 
         for subAttr in self.attributes:
-            result += str(subAttr)
+            result += "\t\t" + str(subAttr)
             result += "\n"
 
         return result

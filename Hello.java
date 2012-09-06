@@ -34,6 +34,10 @@ public class Hello implements IHello, IHello2 {
     @Deprecated
     public int add(int a, int b) {
 
+        int c = 1;
+
+        int d = 5;
+
         try {
             throw new AException();
         } catch (AException e) {
